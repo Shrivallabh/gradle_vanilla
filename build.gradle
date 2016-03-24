@@ -19,3 +19,6 @@ cobertura {
     coverageFormats = [ 'xml', 'html' ]
 }
 
+ant.importBuild('build-example.xml') { antTargetName ->
+    'a-' + antTargetName
+}

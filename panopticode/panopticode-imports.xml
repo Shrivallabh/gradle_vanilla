@@ -49,28 +49,30 @@
     -->
     <import file="supplements/subversion/subversion-imports.xml" />
 
+
+
+
     <macrodef name="panopticode">
         <attribute name="classDir" default="target/classes" />
         <attribute name="panopticodeDir" default="panopticode" />
         <attribute name="projectDir" />
         <attribute name="projectName" />
         <attribute name="projectVersion" />
-        <attribute name="outputDir" default="target" />
-        <attribute name="srcDir" default="src" />
+        <attribute name="outputDir" default="build" />
+        <attribute name="srcDir" default="src/main/java" />
         <attribute name="churn-since" />
         <attribute name="churn-until"  />
         
 
         <sequential>
-            <!-- We don't want any old data to slip in -->
-                <antcall target="clean" />
-
             <!-- Run the panopticode doclet to build the core data structure -->
                 <mkdir dir="@{outputDir}" />
-
+                <echo message="@{srcDir}" />
+                <!-- https://bz.apache.org/bugzilla/show_bug.cgi?id=55949 -->
                 <javadoc classpath="@{panopticodeDir}/panopticode.jar"
                          sourcepath="@{srcDir}"
-                         access="private">
+                         access="private"
+                         postProcessGeneratedJavadocs="false">
                   <fileset dir="@{srcDir}" />
                   <doclet name="org.panopticode.doclet.PanopticodeDoclet"
                           path="@{panopticodeDir}/panopticode.jar">
@@ -109,8 +111,6 @@
                 <!--<panopticode-scm-log projectDir="@{projectDir}"
                                      outputDir="@{outputDir}" />-->
 
-            <!-- Time to compile -->
-                <antcall target="compile" />
 
             <!-- Run any metrics that require compiled code here -->
                 <!-- JDepend (We want to run this just after compile so we don't gather metrics on extra code -->
@@ -126,11 +126,11 @@
 						jdependFile="@{outputDir}/rawmetrics/xml/jdepend.xml" />
 	-->
                 <!-- Coverage -->
-                <panopticode-setup-coverage outputDir="@{outputDir}"
+                <!--<panopticode-setup-coverage outputDir="@{outputDir}"
                                             classDir="@{classDir}" />
                 <antcall target="unit-test" />
                 <panopticode-report-coverage srcDir="@{srcDir}"
-                                             outputDir="@{outputDir}"/>
+                                             outputDir="@{outputDir}"/>-->
 
                 <taskdef name="panopticodeCobertura" 
                          classpath="panopticode/panopticode.jar" 
